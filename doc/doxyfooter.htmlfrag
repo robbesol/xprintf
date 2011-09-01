@@ -1,0 +1,17 @@
+<!--***** Doxygen footer. See http://www.stack.nl/~dimitri/doxygen/config.html#html_output *****-->
+<!--BEGIN GENERATE_TREEVIEW-->
+<!--***** Copied when Doxygen configuration specifies GENERATE_TREEVIEW *****-->
+<li class="footer">Copyright &copy; 2007-$year <a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a> All rights reserved.</li>
+<li class="footer">Generated on $date by <a target="_blank" href="http://www.doxygen.org/">doxygen</a> $doxygenversion.</li>
+</ul>
+</div>
+<!--END GENERATE_TREEVIEW-->
+<!--BEGIN !GENERATE_TREEVIEW-->
+<!--***** Copied when Doxygen configuration does not specify GENERATE_TREEVIEW *****-->
+<hr class="footer"/><address class="footer"><small>
+Copyright &copy; 2007-$year <a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a> All rights reserved.
+<br/>Generated on $date by <a target="_blank" href="http://www.doxygen.org/">doxygen</a> $doxygenversion.
+</small></address>
+<!--END !GENERATE_TREEVIEW-->
+</body>
+</html>

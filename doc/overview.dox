@@ -1,0 +1,144 @@
+/*
+ * Copyright (c) 2007-2011 Markus van Dijk
+ * All rights reserved.
+ *
+ * This file is part of the xprintf project.
+ * The xprintf project is open source software and distributed
+ * under the terms of the Simplified BSD License:
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *	*	Redistributions of source code must retain the above copyright notice,
+ * 		this list of conditions and the following disclaimer.
+ *	*	Redistributions in binary form must reproduce the above copyright notice,
+ * 		this list of conditions and the following disclaimer in the documentation
+ * 		and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ * Doxygen input follows.
+ * Make sure anchors for @page, @section, @subsection etc, start with the module name.
+ *
+ * Use the following to structure your text:
+ * @section <sectionid> <title, can be more words>
+ * @subsection <sectionid> <title, can be more words>
+ */
+
+/**
+ * @mainpage Xprintf documentation
+
+Documentation for the
+<a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a>, @sourceversion.
+<div style="float: right;">
+@image html berlioslogo.png
+</div>
+
+@section xprintf_Overview Overview
+
+ISO C99 @c %fprintf() formatting implementation aimed at embedded SW.
+Your output stream is easily connected. Small code and stack footprint, no @c %malloc().
+Full ISO C99 implementation, floating point support can be disabled.
+
+@section xprintf_History History
+
+Xprintf is an independent implementation of the @c %printf() formatting facility.
+It is written from the ground up by Markus van Dijk, while employed
+by <a href="http://www.technologies88.com/" target="T88">Technologies88</a>.
+
+@note No code was borrowed from any commercial and/or open source.
+
+The xprintf code was used for several years for all string formatting in an embedded project,
+including debug output to a PC, writing to an embedded display and writing to files.
+<br>
+In august 2011 <a href="http://www.technologies88.com/" target="T88">Technologies88</a>
+kindly gave permission to enter the code into the public domain and transferred all rights to Markus van Dijk.
+<br>
+The code now lives as <a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a>.
+
+@section xprintf_Compliance Compliance
+
+This implementation of @c %printf formatting claims to be compliant
+with the ISO C99 standard with corrigenda TC1, TC2, and TC3 included.
+
+@note Common GNU extensions like positional parameters <tt>\"\%1$d\"</tt> are <b><i>not</i></b> supported.
+
+@sa <a href="http://www.open-std.org/">open-std.org</a> ->
+<a href="http://www.open-std.org/JTC1/SC22/WG14/www/standards.html">C standards</a> ->
+<a href="http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf">C99 (PDF)</a>.
+@sa UNIX:<tt> man 3 printf</tt>
+
+@subsection xprintf_Flags Flags
+All flags are implemented: <tt>[<b>\#0- +</b>]</tt>.
+
+@subsection xprintf_Minimumfieldwidth Minimum field width
+The <em>minimum field width</em> is implemented, including the <tt>'*'</tt> specifier.
+
+@subsection xprintf_Precision Precision
+The <em>precision</em> is implemented, including the <tt>'*'</tt> specifier.
+
+@subsection xprintf_int Integral conversion
+@par
+Conversion specifiers<b><tt> \%d \%i \%o \%u \%x \%X </tt></b>with
+length modifiers<b><tt> hh h l ll j z t </tt></b>are fully implemented.
+
+@subsection xprintf_double Double conversion
+@par
+Conversion specifiers<b><tt> \%f \%F \%e \%E \%g \%G </tt></b>with optional
+length modifier<b><tt> l </tt></b>are fully implemented, but <b>no inf/nan output</b>.
+<br>
+Length modifier<b><tt> L </tt></b>(<tt>long double</tt>) is supported,
+but only produces the accuracy of a double.
+@par
+Conversion specifiers<b><tt> \%a \%A </tt></b>are <b>not implemented.</b>
+
+@subsection xprintf_string String conversion
+@par
+Conversion specifiers<b><tt> \%c  \%s </tt></b>without length modifiers are fully implemented.
+<br>
+Wide characters (length modifier <tt>l</tt> for types @c wint_t and @c wchar_t) are <b>not implemented</b>.
+@par
+Conversion specifier<b><tt> \%\#s</tt></b>: an extra <tt>\#</tt> flag is implemented that will print the string \"visually\", using
+\"\\n\", \"\\r\", \"\\t\" and \"\\ooo\" (octal) for non-printable chars and \"\\\\\" for '\\'.
+
+@subsection xprintf_pointer Pointer conversion
+@par
+Conversion specifier<b><tt> \%p </tt></b>is implementation dependent and formatted as <tt>\%\#x</tt>
+
+@subsection xprintf_XXX Write length to argument conversion
+@par
+Conversion specifier<b><tt> \%n </tt></b>without length modifiers  (argument type <tt>int*</tt>) is fully implemented.
+<br>
+Conversion specifier<b><tt> \%n </tt></b>with length modifiers  (argument type other than <tt>int*</tt>) is <b>not implemented</b>.
+
+@subsection xprintf_percent Percent conversion
+@par
+Conversion specifier<b><tt> \%\% </tt></b>is fully implemented :-)
+
+@section xprintf_other Other
+
+NOTE: these functions have to be reentrant, so:
+@par [Wikipedia]
+A computer program or routine is described as reentrant
+if it can be safely executed concurrently; that is,
+the routine can be re-entered while it is already running.
+<br>
+To be reentrant, a function
+@li		must hold no static non-constant data,
+@li		must not return the address to static non-constant data,
+@li		must work only on the data provided to it by the caller,
+@li		must not rely on locks to singleton resources, and
+@li		must not call non-reentrant functions.
+
+
+ */
