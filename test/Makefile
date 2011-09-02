@@ -1,3 +1,4 @@
+# Hey Emacs, this is a -*- makefile -*-
 #
 
 ## where source files live
