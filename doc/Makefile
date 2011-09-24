@@ -125,4 +125,11 @@ DOXYGEN_PROJECT_NUMBER = unversioned
 else
 DOXYGEN_PROJECT_NUMBER = SVN rel $(patsubst %M,%,$(patsubst %P,%,$(strip $(_SVN_VERSION))))
 endif
-	
+
+.PHONY: rsync
+rsync:
+	@echo
+	@echo "===== start publishing doc/html/ to website at berlios.de"
+	@test -d html || ( echo >&2 "***** no directory html/" ; exit 1; )
+	rsync -e 'ssh' -avz --delete html/ shell.berlios.de:/home/groups/xprintf/htdocs/doc
+	@echo "===== done publishing doc/html/ to website at berlios.de"
