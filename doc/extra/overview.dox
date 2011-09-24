@@ -39,10 +39,11 @@
  * @mainpage Xprintf documentation
 
 Documentation for the
-<a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a>, @sourceversion.
+<a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a>
 <div style="float: right;">
 @image html berlioslogo.png
 </div>
+@version @sourceversion.
 
 @section xprintf_Overview Overview
 

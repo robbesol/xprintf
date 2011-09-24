@@ -4,21 +4,25 @@
 #
 
 # set up some vars
-include vars.mk
 
 # Target file name (without extension).
 # For libary 'libXXX.a' use TARGET = XXX
-TARGET = peripheral-$(HW_MODEL)
+TARGET = xprintf
+
+include ../make/vars.mk
 
 INCLUDEDIRS += ../include
 
-COMMON_SRC_DIR = ../src
+## where source files live
+XPRINTF_SRC_DIR = ../xprintf
+LIBC_SRC_DIR = ../libc-replacements
 
-SRC += $(COMMON_SRC_DIR)/xprintf-core.c
-SRC += $(COMMON_SRC_DIR)/xprintf-double.c
-SRC += $(COMMON_SRC_DIR)/xsnprintf.c
-SRC += $(COMMON_SRC_DIR)/snprintf.c
+SRC += $(XPRINTF_SRC_DIR)/xprintf-core.c
+SRC += $(XPRINTF_SRC_DIR)/xprintf-double.c
+SRC += $(XPRINTF_SRC_DIR)/xsnprintf.c
+SRC += $(LIBC_SRC_DIR)/snprintf.c
+$(OBJPREFIX)$(XPRINTF_SRC_DIR)/snprintf.o: CFLAGS += -fno-builtin-snprintf -fno-builtin-vsnprintf
 
-#SRC += $(COMMON_SRC_DIR)/xprintf-rsrc.c
+#SRC += $(XPRINTF_SRC_DIR)/xprintf-rsrc.c
 
-include staticlib.mk
+include $(MK_DIR)staticlib.mk

@@ -1,40 +1,19 @@
 # Hey Emacs, this is a -*- makefile -*-
 #
+# To rebuild project do "make clean" then "make all".
+#
+
+# set up some vars
+
+include ../make/vars.mk
+
+INCLUDEDIRS += ../include
 
 ## where source files live
-COMPUBPRINTF = ../src
+XPRINTF_SRC_DIR = ../xprintf
 
-CFLAGS += -I../include
-
-CFLAGS += -g
-
-CFLAGS += -std=gnu99
-
-# treat warnings as errors -- a gentle push in the back to write clean, portable code.
-CFLAGS += -Werror
-
-#warnings
-CFLAGS += -pedantic
-CFLAGS += -Wall -Wextra
-CFLAGS += -Wformat-extra-args -Wformat-zero-length -Wformat-nonliteral -Wformat-security
-
-CFLAGS += -Wcast-align -Wimplicit 
-CFLAGS += -Wpointer-arith -Wswitch
-CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
-CFLAGS += -Wcast-qual
-CFLAGS += -Wnested-externs 
-
-CFLAGS += -Wmissing-prototypes 
-CFLAGS += -Wstrict-prototypes
-CFLAGS += -Wmissing-declarations
-
+# turn on debugging for testing
 CPPFLAGS += -DTESTDEBUG
-
-# Compiler flags to generate dependency files.
-CPPFLAGS += -MD -MP
-
-
-OBJPREFIX = obj/dot/dot/
 
 SRC_TESTS += tests-double.c
 SRC_TESTS += tests-nodoubles.c
@@ -48,13 +27,13 @@ SRC_HOST = test-host.c $(SRC_TESTS)
 test-host: $(addprefix $(OBJPREFIX),$(SRC_HOST:.c=.o))
 	$(CC) $(LDFLAGS) -o $@ $^
 
-SRC_COMMON_LIB += $(COMPUBPRINTF)/xprintf-core.c
-#SRC_COMMON_LIB += $(COMPUBPRINTF)/xprintf-util.c
-SRC_COMMON_LIB += $(COMPUBPRINTF)/xprintf-debug.c
+SRC_COMMON_LIB += $(XPRINTF_SRC_DIR)/xprintf-core.c
+#SRC_COMMON_LIB += $(XPRINTF_SRC_DIR)/xprintf-util.c
+SRC_COMMON_LIB += $(XPRINTF_SRC_DIR)/xprintf-debug.c
 SRC_COMMON_LIB += impl.c
 SRC_COMMON_LIB += $(SRC_TESTS)
 
-SRC_LIB_FLOAT += $(COMPUBPRINTF)/xprintf-double.c
+SRC_LIB_FLOAT += $(XPRINTF_SRC_DIR)/xprintf-double.c
 
 SRC_PRINTF = test-xvprintf-protected.c
 SRC_PRINTF += xprintf-core-hosttest.c
@@ -63,7 +42,7 @@ SRC_PRINTF_NODOUBLES = test-xvprintf-protected-nodoubles.c
 SRC_PRINTF_NODOUBLES += xprintf-core-hosttest.c
 
 SRC_SPRINTF = test-xvsnprintf.c
-SRC_SPRINTF += $(COMPUBPRINTF)/xsnprintf.c
+SRC_SPRINTF += $(XPRINTF_SRC_DIR)/xsnprintf.c
 
 SRC_RSRC = test-xvprintf-protected.c
 SRC_RSRC += xprintf-core-hosttest.c
@@ -80,7 +59,7 @@ ALL_EXECUTABLES = $(TEST_EXECUTABLES) printf-pointer
 
 all: $(ALL_EXECUTABLES)
 
-this: all
+this :: all
 
 test: run-test-all
 
@@ -133,20 +112,16 @@ printf-pointer: $(OBJPREFIX)printf-pointer.o
 # exceptions for "%#s" format:
 $(OBJPREFIX)printf-pointer.o: CFLAGS += -Wno-format
 # redundant redeclaration of 'xxx':
-$(OBJPREFIX)$(COMPUBPRINTF)/xprintf-double.o: CFLAGS += -Wno-redundant-decls
-
-
-# general .c -> .o rule
-$(OBJPREFIX)%.o: %.c
-	@test -d $(dir $@) || mkdir -p $(dir $@)
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
+$(OBJPREFIX)$(XPRINTF_SRC_DIR)/xprintf-double.o: CFLAGS += -Wno-redundant-decls
 
 clean::
 	-rm -rf obj
 	-rm -f $(LIBXPRINTF) $(ALL_EXECUTABLES)
 
 # Include the dependency files, but not during a clean.
-ifeq ($(filter clean%,$(MAKECMDGOALS)),) 
+ifeq (,$(filter clean%,$(MAKECMDGOALS))) 
 -include $(OBJPREFIX)*.d
--include $(OBJPREFIX)$(COMPUBPRINTF)/*.d
+-include $(OBJPREFIX)$(XPRINTF_SRC_DIR)/*.d
 endif 
+
+include $(MK_DIR)cso.mk

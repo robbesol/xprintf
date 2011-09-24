@@ -26,43 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "test-rig.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
-static test_printf_fn test_xprintf;
-
-static int test_xprintf(struct test_printf_info *tpi, const char *expected,
-		int expectedLen, const char *format, va_list ap) {
-	char *resultString;
-	int resultLen = vasprintf(&resultString, format, ap);
-	int result = compareResult(tpi, expected, expectedLen, format,
-			resultString, resultLen);
-	free(resultString);
-	return result;
-}
-
-int main(void) {
-
-#ifdef __GNUC__
-	// printf("===== __GNUC__: %d.%d.%d\n", __GNUC__ + 0, __GNUC_MINOR__ + 0, __GNUC_PATCHLEVEL__ + 0);
-	printf("===== gcc: %s\n", __VERSION__);
-#else
-#error "===== unknown compiler ====="
-#endif
-
-#ifdef __STDC__
-	//  __STDC_VERSION__ is a (long int)
-	printf("===== __STDC_VERSION__: %ld\n", __STDC_VERSION__);
-#else /* __STDC__ */
-#error "===== compiled as not ISO-C99 ====="
-#endif /* __STDC__ */
-
-	setTestingHost(1);
-	DEFINE_test_printf_info("vasprintf(HOST)", test_xprintf);
-
-	test_all_iso(tpi);
-
-	return endAllTests(tpi) != 0; // return 1 in case of errors
+// The program entry symbol, not weak.
+void checkusedsymbols_start(void) {
+	/* dummy body */
 }

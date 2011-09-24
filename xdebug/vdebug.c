@@ -26,43 +26,53 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "test-rig.h"
+#include "xdebug.h"
+#include "xdebugchannel.h"
+#include "impl/xvdebug.h"
+#include "impl/xprintf-rsrc.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
-static test_printf_fn test_xprintf;
-
-static int test_xprintf(struct test_printf_info *tpi, const char *expected,
-		int expectedLen, const char *format, va_list ap) {
-	char *resultString;
-	int resultLen = vasprintf(&resultString, format, ap);
-	int result = compareResult(tpi, expected, expectedLen, format,
-			resultString, resultLen);
-	free(resultString);
-	return result;
+int vdebugNonl(const char *format, va_list ap) {
+	if (format == 0) {
+		return 0; // OK, 0 chars written
+	}
+	struct xprintf_channel *ch = debug_getChannel();
+	if (ch == 0) {
+		return 0; // OK, 0 chars written
+	}
+	struct xprintf_protectedChannel xchpr;
+	int status = xprintf_beginProtectedIO(ch, &xchpr);
+	if (status < 0) {
+		return status;
+	}
+	status = xvprintf_protected(&xchpr, format, ap);
+	xprintf_endProtectedIO(&xchpr);
+	return status;
 }
 
-int main(void) {
+static inline int debug_printf_protected(
+		struct xprintf_protectedChannel *xchpr, const char *format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	int outCount = xvprintf_protected(xchpr, format, ap);
+	va_end(ap);
+	return outCount;
+}
 
-#ifdef __GNUC__
-	// printf("===== __GNUC__: %d.%d.%d\n", __GNUC__ + 0, __GNUC_MINOR__ + 0, __GNUC_PATCHLEVEL__ + 0);
-	printf("===== gcc: %s\n", __VERSION__);
-#else
-#error "===== unknown compiler ====="
-#endif
-
-#ifdef __STDC__
-	//  __STDC_VERSION__ is a (long int)
-	printf("===== __STDC_VERSION__: %ld\n", __STDC_VERSION__);
-#else /* __STDC__ */
-#error "===== compiled as not ISO-C99 ====="
-#endif /* __STDC__ */
-
-	setTestingHost(1);
-	DEFINE_test_printf_info("vasprintf(HOST)", test_xprintf);
-
-	test_all_iso(tpi);
-
-	return endAllTests(tpi) != 0; // return 1 in case of errors
+int vdebugnl(const char *format, va_list ap) {
+	if (format == 0) {
+		return 0; // OK, 0 chars written
+	}
+	struct xprintf_channel *ch = debug_getChannel();
+	if (ch == 0) {
+		return 0; // OK, 0 chars written
+	}
+	struct xprintf_protectedChannel xchpr;
+	int status = xprintf_beginProtectedIO(ch, &xchpr);
+	if (status < 0) {
+		return status;
+	}
+	status = xvprintf_protected(&xchpr, format, ap);
+	debug_printf_protected(&xchpr, "%s", "\r\n");
+	xprintf_endProtectedIO(&xchpr);
+	return status;
 }

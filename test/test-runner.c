@@ -364,16 +364,6 @@ int testHost(char curFile[], int curLine, struct test_printf_info * tpi,
 	return result;
 }
 
-#ifdef __GXX_ABI_VERSION
-static const int onGcc = __GXX_ABI_VERSION;
-#else
-static const int onGcc = 0;
-#endif
-
-int isOnGcc(void) {
-	return onGcc;
-}
-
 static int testingHost = 0;
 
 void setTestingHost(int value) {

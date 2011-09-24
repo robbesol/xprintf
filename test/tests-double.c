@@ -117,8 +117,8 @@ void test_iso_doubles(struct test_printf_info *tpi) {
 	if (isTestingHost()) {
 		fprintf(
 				stderr,
-				"----- not running NAN and INF tests for \"%%0f\" because GCC's libc is broken (v %d)\n",
-				isOnGcc());
+				"----- not running NAN and INF tests for \"%%0f\" because libc is broken for gcc %s\n",
+				__VERSION__);
 	} else {
 		TEST("    nan", "%07f", NAN);
 		TEST("    inf", "%07f", INFINITY);

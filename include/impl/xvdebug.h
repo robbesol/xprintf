@@ -26,43 +26,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "test-rig.h"
+#ifndef IMPL_XVDEBUG_H_
+#define IMPL_XVDEBUG_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdarg.h>
 
-static test_printf_fn test_xprintf;
+/**
+ * \file
+ *
+ * For convenience, %xvdebug.h also causes an include of xdebug.h.
+ */
 
-static int test_xprintf(struct test_printf_info *tpi, const char *expected,
-		int expectedLen, const char *format, va_list ap) {
-	char *resultString;
-	int resultLen = vasprintf(&resultString, format, ap);
-	int result = compareResult(tpi, expected, expectedLen, format,
-			resultString, resultLen);
-	free(resultString);
-	return result;
+#include "xdebug.h"
+// xdebug.h defines DEBUG_DISABLED and DEBUG_FN_QUALIFIERS
+
+/**
+ * @sa debugnl()
+ * @param format vfprintf() compatible format string
+ * @param ap vfprintf() compatible va_list
+ * \return &lt0: error <br> >=0: number of chars written (excluding the added newline)
+ */
+DEBUG_FN_QUALIFIERS
+int vdebugnl(const char *format, va_list ap);
+
+/**
+ * @sa debugNonl()
+ * @param format vfprintf() compatible format string
+ * @param ap vfprintf() compatible va_list
+ * \return &lt0: error <br> >=0: number of chars written
+ */
+DEBUG_FN_QUALIFIERS
+int vdebugNonl(const char *format, va_list ap);
+
+#if DEBUG_DISABLED
+// dummy inline bodies
+
+DEBUG_FN_QUALIFIERS
+int vdebugnl(const char *format, va_list ap) {
+	(void) format;
+	(void) ap;
+	return 0;
 }
 
-int main(void) {
+DEBUG_FN_QUALIFIERS
+int vdebugNonl(const char *format, va_list ap) {
+	(void) format;
+	(void) ap;
+	return 0;
+}
 
-#ifdef __GNUC__
-	// printf("===== __GNUC__: %d.%d.%d\n", __GNUC__ + 0, __GNUC_MINOR__ + 0, __GNUC_PATCHLEVEL__ + 0);
-	printf("===== gcc: %s\n", __VERSION__);
-#else
-#error "===== unknown compiler ====="
 #endif
 
-#ifdef __STDC__
-	//  __STDC_VERSION__ is a (long int)
-	printf("===== __STDC_VERSION__: %ld\n", __STDC_VERSION__);
-#else /* __STDC__ */
-#error "===== compiled as not ISO-C99 ====="
-#endif /* __STDC__ */
-
-	setTestingHost(1);
-	DEFINE_test_printf_info("vasprintf(HOST)", test_xprintf);
-
-	test_all_iso(tpi);
-
-	return endAllTests(tpi) != 0; // return 1 in case of errors
-}
+#endif /*IMPL_XVDEBUG_H_*/

@@ -78,7 +78,6 @@ int vtest(struct test_printf_info *, char *xanswer,
 int vtestHost(struct test_printf_info *, const char * restrict format,
 		va_list ap);
 
-int isOnGcc(void);
 int isTestingHost(void);
 
 void test_setpos(const char curFile[], int curLine,

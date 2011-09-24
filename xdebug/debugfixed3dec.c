@@ -26,43 +26,50 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "test-rig.h"
+#include "xdebug.h"
+#include "impl/xvdebug.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+int debugF3(int64_t value, int divider) {
+	if (divider <= 0) {
+		return debugNonl("%lld/%d", value, divider);
+	}
 
-static test_printf_fn test_xprintf;
+	if (value == 0) {
+		return debugNonl("0");
+	}
 
-static int test_xprintf(struct test_printf_info *tpi, const char *expected,
-		int expectedLen, const char *format, va_list ap) {
-	char *resultString;
-	int resultLen = vasprintf(&resultString, format, ap);
-	int result = compareResult(tpi, expected, expectedLen, format,
-			resultString, resultLen);
-	free(resultString);
-	return result;
+	char *sign = "+";
+	if (value < 0) {
+		sign = "-";
+		value = -value;
+	}
+
+	int vi = value / divider;
+
+	uint64_t vf1000 = value % divider;
+	vf1000 *= 1000;
+	vf1000 /= divider;
+
+	return debugNonl("%s%d.%03d", sign, vi, (int) vf1000);
 }
 
-int main(void) {
+int debugStringF3(const char *s, int64_t value, int divider) {
+	int scount = 0;
+	if (s != 0) {
+		scount = debugNonl("%s", s);
+	}
+	return scount + debugF3(value, divider);
+}
 
-#ifdef __GNUC__
-	// printf("===== __GNUC__: %d.%d.%d\n", __GNUC__ + 0, __GNUC_MINOR__ + 0, __GNUC_PATCHLEVEL__ + 0);
-	printf("===== gcc: %s\n", __VERSION__);
-#else
-#error "===== unknown compiler ====="
-#endif
-
-#ifdef __STDC__
-	//  __STDC_VERSION__ is a (long int)
-	printf("===== __STDC_VERSION__: %ld\n", __STDC_VERSION__);
-#else /* __STDC__ */
-#error "===== compiled as not ISO-C99 ====="
-#endif /* __STDC__ */
-
-	setTestingHost(1);
-	DEFINE_test_printf_info("vasprintf(HOST)", test_xprintf);
-
-	test_all_iso(tpi);
-
-	return endAllTests(tpi) != 0; // return 1 in case of errors
+int debugF3nl(int64_t value, int divider, const char *format, ...) {
+	int scount = 0;
+	if (format != 0) {
+		va_list ap;
+		va_start(ap, format);
+		scount = vdebugNonl(format, ap);
+		va_end(ap);
+		scount += debugNonl(": ");
+	}
+	scount += debugF3(value, divider);
+	return scount + debugNL();
 }
