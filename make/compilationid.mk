@@ -1,15 +1,18 @@
 # Hey Emacs, this is a -*- makefile -*-
 #
 
-ifeq (,$(strip $(TARGET)))
-$(error No TARGET defined)
+ifeq (,$(strip $(TARGET_NAME)))
+$(error No TARGET_NAME defined)
 endif
+
+COMPILATIONID_FILE_C = $(GENERATED_SRC_DIR)compiledstring-$(TARGET_NAME).c
+COMPILATIONID_FILE_H = $(COMPILATIONID_FILE_C:.c=.h)
 
 ifeq (,$(strip $(PROJECT_TOP_DIR)))
 PROJECT_TOP_DIR = ..
 endif
 
-_COMPILATIONID_MK_FILE := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+_COMPILATIONID_MK_FILE := $(lastword $(MAKEFILE_LIST))
 
 # The raw ident output triggers lots of errors being detected by Eclipse.
 # Inserting a space in front of the first colon ("$Key: " -> "$Key : ") seems to prevent that.
@@ -42,11 +45,9 @@ ifeq (,$(strip $(_SVNID_INFO_VERSION)))
 _SVNID_INFO_VERSION := noversion
 endif
 
-_COMPILATIONID_STRING_LEAD := $$Build: $(_SVNID_INFO_URL) $(_SVNID_INFO_VERSION) $(_COMPILATIONID_PROJ_REL_HERE)/ compiled
+_COMPILATIONID_STRING_LEAD = $(TARGET_NAME) $(_SVNID_INFO_URL) $(_SVNID_INFO_VERSION) $(_COMPILATIONID_PROJ_REL_HERE)/ at
 
-_COMPILATIONID_FILES_BASENAME = $(GENERATED_SRC_DIR)compiledstring
-
-_COMPILATIONID_TARGET_C = $(subst -,_,$(TARGET))
+_COMPILATIONID_TARGET_C = $(subst -,_,$(TARGET_NAME))
 _COMPILATIONID_STRING_H_TOKEN = COMPILED_STRING_$(_COMPILATIONID_TARGET_C)_H_
 
 COMPILATIONID_COMPILEDSTRING_VARIABLE = CompiledString_$(_COMPILATIONID_TARGET_C)
@@ -56,13 +57,13 @@ _COMPILATIONID_COMPILEDSTRING_DECL = const char $(COMPILATIONID_COMPILEDSTRING_V
 COMPILATIONID_SOFTWAREVERSION_VARIABLE = SoftwareVersion_$(_COMPILATIONID_TARGET_C)
 _COMPILATIONID_VERSIONSTRING_DECL = const char $(COMPILATIONID_SOFTWAREVERSION_VARIABLE)[]
 
-ifeq (,$(shell test -f $(_COMPILATIONID_FILES_BASENAME).c && grep '$(_COMPILATIONID_STRING_LEAD)' $(_COMPILATIONID_FILES_BASENAME).c))
-# different compilation info -- force recompilation of compilationid info file
-.PHONY: $(_COMPILATIONID_FILES_BASENAME).c
+ifeq (,$(strip $(shell test -f $(COMPILATIONID_FILE_C) && grep '$(_COMPILATIONID_STRING_LEAD)' $(COMPILATIONID_FILE_C))))
+# no match: different compilation info -- force recompilation of compilationid info file
+.PHONY: $(COMPILATIONID_FILE_C)
+$(info different version info in $(COMPILATIONID_FILE_C))
 endif
-SRC += $(_COMPILATIONID_FILES_BASENAME).c
 
-$(_COMPILATIONID_FILES_BASENAME).h: $(_COMPILATIONID_MK_FILE)
+$(COMPILATIONID_FILE_H): $(_COMPILATIONID_MK_FILE)
 	@test -d $(GENERATED_SRC_DIR) || mkdir $(GENERATED_SRC_DIR)
 	@echo
 	@echo "Creating: $@"
@@ -72,13 +73,13 @@ $(_COMPILATIONID_FILES_BASENAME).h: $(_COMPILATIONID_MK_FILE)
 	@echo 'extern $(_COMPILATIONID_COMPILEDSTRING_DECL);' >>$@
 	@echo '#endif /*$(_COMPILATIONID_STRING_H_TOKEN)*/' >>$@
 
-$(_COMPILATIONID_FILES_BASENAME).c: $(_COMPILATIONID_FILES_BASENAME).h $(_COMPILATIONID_MK_FILE)
+$(COMPILATIONID_FILE_C): $(COMPILATIONID_FILE_H) $(_COMPILATIONID_MK_FILE)
 	@echo
-	@echo "Creating $@"
-	@echo '#include "compiledstring.h"' > $@
+	@echo "Creating: $@"
+	@echo '#include "$(notdir $(COMPILATIONID_FILE_H))"' > $@
 	@echo '$(_COMPILATIONID_VERSIONSTRING_DECL) =  "$(_SVNID_INFO_VERSION)";' >> $@
-	@echo '$(_COMPILATIONID_COMPILEDSTRING_DECL) = "$(_COMPILATIONID_STRING_LEAD) " __DATE__ " " __TIME__ " $(CC) " __VERSION__ " $$";' >> $@
+	@echo '$(_COMPILATIONID_COMPILEDSTRING_DECL) = "$$Build: $(_COMPILATIONID_STRING_LEAD) " __DATE__ " " __TIME__ " $(CC) " __VERSION__ " $$";' >> $@
 
 .PHONY: clean cleanall
 clean cleanall::
-	$(RM) $(_COMPILATIONID_FILES_BASENAME).*
+	$(RM) $(COMPILATIONID_FILE_H) $(COMPILATIONID_FILE_C)

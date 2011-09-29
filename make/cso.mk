@@ -25,7 +25,6 @@ endif
 ############################################################################
 
 SRCE = $(SRC:.c=.E)
-$(SRCE): $(MAKEFILE_LIST)
 $(SRCE): %.E: %.c
 	@echo
 	@echo "Preprocessing C: $<"
@@ -35,7 +34,6 @@ preprocessed: $(SRCE)
 
 
 SRCASM = $(SRC:.c=.s)
-$(SRCASM): $(MAKEFILE_LIST)
 $(SRCASM): %.s: %.c
 	@echo
 	@echo "Compiling C to assembly: $<"
@@ -47,7 +45,8 @@ asmcode: $(SRCASM)
 # Define all object files.
 ALLOBJ = $(addprefix $(OBJPREFIX),$(SRC:.c=.o)) 
 .PRECIOUS : $(ALLOBJ)
-$(ALLOBJ): $(MAKEFILE_LIST)
+
+$(SRCE) $(SRCASM) $(ALLOBJ): $(MAKEFILE_LIST_NO_DEPS)
 
 $(OBJPREFIX)%.o: %.c
 	@test -d $(dir $@) || mkdir -p $(dir $@)

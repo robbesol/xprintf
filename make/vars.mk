@@ -39,6 +39,8 @@ this::
 
 MK_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 
+MAKEFILE_LIST_NO_DEPS = $(filter-out %.d,$(MAKEFILE_LIST))
+
 OBJPREFIX = obj/dot/dot/
 GENERATED_SRC_DIR = src-generated/
 
@@ -111,12 +113,31 @@ ARFLAGS = rvs
 NM = nm
 
 
+##==================================================
 # Compiler flags to generate dependency files.
 ### DEPFLAGS += -Wp,-M,-MP,-MT,$(*F).o,-MF,.dep/$(@F).d
 DEPFLAGS += -MD
 # Add "phony" targets (empty) for header files. Good for when a header file disappears (rename, obsolete). 
 DEPFLAGS += -MP
 
+
+##==================================================
+# CHECKUSEDSYMBOLS_DUMMIES_C holds the file(s) with dummy defenitions of
+# the restricted allowed set of functions from -lc and other allowed external symbols
+# CHECKUSEDSYMBOLS_DUMMIES_C may be empty
+
+# program start symbol for check:
+CHECKUSEDSYMBOLS_STARTSYMBOL = checkusedsymbols_start
+CHECKUSEDSYMBOLS_STARTFILE_C = $(MK_DIR)checkusedsymbols-start.c
+
+# gcc flags to compile CHECKUSEDSYMBOLS_DUMMIES_C:
+CHECKUSEDSYMBOLS_CFLAGS = $(CSTANDARD) -fno-builtin
+
+# gcc flags to link with no default libraries, only CHECKUSEDSYMBOLS_LIBS and CHECKUSEDSYMBOLS_DUMMIES_C:
+CHECKUSEDSYMBOLS_LIBS = -lgcc
+CHECKUSEDSYMBOLS_LDFLAGS = -nostartfiles -nodefaultlibs -static 
+# gcc flags to link with start symbol CHECKUSEDSYMBOLS_STARTSYMBOL:
+CHECKUSEDSYMBOLS_LDFLAGS += -Xlinker -e -Xlinker _$(CHECKUSEDSYMBOLS_STARTSYMBOL)
 
 ##==================================================
 ##
