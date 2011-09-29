@@ -39,13 +39,15 @@ DOXYGEN_PROJECT_NAME := $(lastword $(subst /, ,$(abspath $(BASE_PROJECT_ROOT_DIR
 endif
 
 doc::
-	@echo "===== start generating doc: $(DOXYGEN_PROJECT_NAME)"
+	@echo
+	@echo "===== start generating doc: $(DOXYGEN_PROJECT_NAME) for $(DOXYGEN_PROJECT_NUMBER)"
 
 ########## regular doxygen stuff for target
 
 ifeq (,$(strip $(DOXYGEN_INPUTS)))
 $(error No DOXYGEN_INPUTS defined)
 endif
+
 
 DOXYGEN ?= doxygen
 
@@ -59,6 +61,10 @@ DOXYGEN_EXAMPLE_SRC := $(wildcard $(DOXYGEN_EXAMPLES_DIR)/*.c)
 DOXYGEN_EXAMPLE_XXX =$(DOXYGEN_EXAMPLE_SRC:.c=.XXX)
 
 DOXYGEN_EXAMPLES_CFLAGS ?= -Wno-unused -Wno-nested-externs -Wno-missing-declarations -Wno-missing-prototypes
+
+#------------------
+
+_DOC_MAKEFILE = $(lastword $(MAKEFILE_LIST))
 
 ifneq (,$(DOXYGEN_EXAMPLES_DIR))
 
@@ -75,7 +81,7 @@ doc clean cleanall::
 
 endif
 	
-Doxygen/incl-inputs: Makefile $(_DOXMK_MKFILE_PATH)
+Doxygen/incl-inputs: $(_DOC_MAKEFILE) $(_DOXMK_MKFILE_PATH)
 	@echo "Creating $@ for $(DOXYGEN_PROJECT_NAME)"
 	@test -d Doxygen || mkdir Doxygen
 	@echo >$@ "# generated `date`"
@@ -85,13 +91,12 @@ Doxygen/incl-inputs: Makefile $(_DOXMK_MKFILE_PATH)
 	@echo >>$@ "HTML_FOOTER = extra/doxyfooter.htmlfrag"
 	@echo >>$@ "INCLUDE_PATH = $(INCLUDEDIRS)"
 
-Doxygen/incl-general: Makefile $(_DOXMK_MKFILE_PATH)
+Doxygen/incl-general: $(_DOC_MAKEFILE) $(_DOXMK_MKFILE_PATH)
 	@echo "Creating $@ for $(DOXYGEN_PROJECT_NAME)"
 	@test -d Doxygen || mkdir Doxygen
 	@echo >$@ "# generated `date`"
 	@echo >>$@ "PROJECT_NAME = $(DOXYGEN_PROJECT_NAME)"
-	@echo >>$@ "PROJECT_NUMBER = \"$(DOXYGEN_PROJECT_NUMBER)\""
-	@echo >>$@ "ALIASES += sourceversion=\"$(DOXYGEN_PROJECT_NUMBER)\""
+	@echo >>$@ "@INCLUDE = Doxygen/incl-version"
 	@echo >>$@ "PROJECT_BRIEF = \"$(DOXYGEN_PROJECT_BRIEF)\""
 	@echo >>$@ "GENERATE_TAGFILE = Doxygen/tags-$(DOXYGEN_PROJECT_NAME)"
 	@echo >>$@ "OUTPUT_DIRECTORY = $(DOXYGEN_OUTPUT_DIRECTORY)"
@@ -101,15 +106,20 @@ ifneq (,$(DOXYGEN_IMAGE_PATH))
 	@echo >>$@ "IMAGE_PATH = $(DOXYGEN_IMAGE_PATH)"
 endif
 
+.PHONY: Doxygen/incl-version
+Doxygen/incl-version:
+	@echo >>$@ "PROJECT_NUMBER = \"$(DOXYGEN_PROJECT_NUMBER)\""
+	@echo >>$@ "ALIASES += sourceversion=\"$(DOXYGEN_PROJECT_NUMBER)\""
+
 .PHONY: doc
 
-doc:: Doxygen/incl-inputs Doxygen/incl-general $(DOXYGEN_CONFIG) $(DOXYGEN_EXAMPLE_XXX)
+doc:: Doxygen/incl-inputs Doxygen/incl-general Doxygen/incl-version $(DOXYGEN_CONFIG) $(DOXYGEN_EXAMPLE_XXX)
 	@echo "Running Doxygen for $(DOXYGEN_PROJECT_NAME)"
 	-@$(RM) -rf $(DOXYGEN_OUTPUT_DIRECTORY)/html/*
 	@$(DOXYGEN) $(DOXYGEN_CONFIG)
 
 doc::
-	@echo "===== done generating doc: $(DOXYGEN_PROJECT_NAME)"
+	@echo "===== done generating doc: $(DOXYGEN_PROJECT_NAME) for $(DOXYGEN_PROJECT_NUMBER)"
 
 clean cleanall::
 	$(RM) -rf Doxygen
