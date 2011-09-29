@@ -41,7 +41,7 @@ static inline void DEBUG_FORMAT(const char * const nptr,
 static void DEBUG_FORMAT(const char * const format,
 		const struct xprintf__conversionPparams *params, const char *msgFmt, ...) {
 	// convert enum xprintf__conversionSpec to a char
-	static const char specChars[] = "?dufcs%gp";
+	static const char specChars[] = "?duefgcs%apn";
 	char consSpecChar;
 	if (params->convSpec < (sizeof specChars) - 1) {
 		consSpecChar = specChars[params->convSpec];
