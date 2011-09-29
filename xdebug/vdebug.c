@@ -26,53 +26,75 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xdebug.h"
-#include "xdebugchannel.h"
-#include "impl/xvdebug.h"
-#include "impl/xprintf-rsrc.h"
+/**
+ * This file is an example implementation of the vdebug functions.
+ *
+ * In this implementation, the output channel is not locked before use.
+ * You can use this implementation if you have a single-thread program environment
+ * and if the channel's write function does its own locking.
+ *
+ * In a multi-thread environment, debug statements from different threads may interrupt
+ * each other, causing problems on HW level or causing output to be mangled.
+ * Locking will prevent this.
+ */
 
-int vdebugNonl(const char *format, va_list ap) {
+#include "impl/xvdebug.h"
+#include "xdebugchannel.h"
+#include "impl/xprintf-core.h"
+
+static inline int vdebug_start(struct xprintf_protectedChannel *xchpr,
+		const char *format, va_list ap) {
 	if (format == 0) {
 		return 0; // OK, 0 chars written
 	}
-	struct xprintf_channel *ch = debug_getChannel();
-	if (ch == 0) {
-		return 0; // OK, 0 chars written
+
+	xchpr->channel = debug_getChannel();
+	if (xchpr->channel == 0) {
+		// OK, no output channel to print to
+		return 0; // no chars printed
 	}
-	struct xprintf_protectedChannel xchpr;
-	int status = xprintf_beginProtectedIO(ch, &xchpr);
-	if (status < 0) {
-		return status;
-	}
-	status = xvprintf_protected(&xchpr, format, ap);
-	xprintf_endProtectedIO(&xchpr);
-	return status;
+
+	/*
+	 * Obtain lock for HW and/or SW.
+	 * In case of failure or timeout, return negative result.
+	 */
+	// In this implementation: no lock used, so nothing to obtain -> success.
+
+	return xvprintf_protected(xchpr, format, ap);
 }
 
-static inline int debug_printf_protected(
-		struct xprintf_protectedChannel *xchpr, const char *format, ...) {
-	va_list ap;
-	va_start(ap, format);
-	int outCount = xvprintf_protected(xchpr, format, ap);
-	va_end(ap);
+static inline int vdebug_end(struct xprintf_protectedChannel *xchpr,
+		const char *format, ...) {
+	int outCount = 0;
+
+	/*
+	 * write line terminator, if needed
+	 */
+	if (format != 0) {
+		va_list ap;
+		va_start(ap, format);
+		outCount = xvprintf_protected(xchpr, format, ap);
+		va_end(ap);
+	}
+
+	/*
+	 * Release lock. Should not fail. (or ignore failure?)
+	 */
+	// In this implementation: no lock used, so nothing to release.
+
+	return outCount;
+}
+
+int vdebugNonl(const char *format, va_list ap) {
+	struct xprintf_protectedChannel xchpr;
+	int outCount = vdebug_start(&xchpr, format, ap);
+	outCount += vdebug_end(&xchpr, 0);
 	return outCount;
 }
 
 int vdebugnl(const char *format, va_list ap) {
-	if (format == 0) {
-		return 0; // OK, 0 chars written
-	}
-	struct xprintf_channel *ch = debug_getChannel();
-	if (ch == 0) {
-		return 0; // OK, 0 chars written
-	}
 	struct xprintf_protectedChannel xchpr;
-	int status = xprintf_beginProtectedIO(ch, &xchpr);
-	if (status < 0) {
-		return status;
-	}
-	status = xvprintf_protected(&xchpr, format, ap);
-	debug_printf_protected(&xchpr, "%s", "\r\n");
-	xprintf_endProtectedIO(&xchpr);
-	return status;
+	int outCount = vdebug_start(&xchpr, format, ap);
+	outCount += vdebug_end(&xchpr, "\r\n");
+	return outCount;
 }
