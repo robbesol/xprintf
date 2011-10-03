@@ -1,0 +1,7 @@
+/obj
+/libxprintf.a
+/test-xvsnprintf
+/test-xvprintf-protected-nodouble
+/test-xvprintf
+/test-xvprintf-protected
+/test-host
