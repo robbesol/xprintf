@@ -8,10 +8,6 @@ endif
 COMPILATIONID_FILE_C = $(GENERATED_SRC_DIR)compiledstring-$(TARGET_NAME).c
 COMPILATIONID_FILE_H = $(COMPILATIONID_FILE_C:.c=.h)
 
-ifeq (,$(strip $(PROJECT_TOP_DIR)))
-PROJECT_TOP_DIR = ..
-endif
-
 _COMPILATIONID_MK_FILE := $(lastword $(MAKEFILE_LIST))
 
 # The raw ident output triggers lots of errors being detected by Eclipse.
@@ -21,31 +17,29 @@ define IDENT
 ident -q $1 | sed -n -e 's/: / : /' -e 's/^[ 	][ 	]*//p'
 endef
 
+ifeq (,$(strip $(PROJECT_TOP_DIR)))
+PROJECT_TOP_DIR = ..
+endif
+
+-include $(dir $(_COMPILATIONID_MK_FILE))vcs.mk
+
 # variables with two leading underscores are only used to build other variables 
 __COMPILATIONID_HERE := $(shell pwd)
-__COMPILATIONID_PROJPARENT_DIR := $(shell cd $(PROJECT_TOP_DIR)/.. && pwd)
-__COMPILATIONID_PROJPARENT_REL_HERE := $(patsubst $(__COMPILATIONID_PROJPARENT_DIR)/%,%,$(__COMPILATIONID_HERE))
+__COMPILATIONID_PROJ_PATH := $(shell cd $(PROJECT_TOP_DIR) && pwd)
 
-_COMPILATIONID_PROJ_BASENAME := $(firstword $(subst /, ,$(__COMPILATIONID_PROJPARENT_REL_HERE)))
-_COMPILATIONID_PROJ_ROOT_DIR := $(__COMPILATIONID_PROJPARENT_DIR)/$(_COMPILATIONID_PROJ_BASENAME)
+_COMPILATIONID_PROJ_BASENAME := $(notdir $(__COMPILATIONID_PROJ_PATH))
 
-_COMPILATIONID_PROJ_REL_HERE := $(patsubst $(_COMPILATIONID_PROJ_BASENAME)/%,%,$(__COMPILATIONID_PROJPARENT_REL_HERE))
+_COMPILATIONID_PROJ_REL_HERE := $(patsubst $(__COMPILATIONID_PROJ_PATH)/%,%,$(__COMPILATIONID_HERE))
 
-_SVNID_INFO_URL := $(strip $(shell cd $(_COMPILATIONID_PROJ_ROOT_DIR) && svn info | sed -n -e 's|^URL: svn[+]ssh|URL: svn|' -e 's|://[^@]*@|://|' -e 's/^URL://p'))
-ifeq (,$(strip $(_SVNID_INFO_URL)))
-_SVNID_INFO_URL := $(_COMPILATIONID_PROJ_BASENAME)/$(_COMPILATIONID_PROJ_REL_HERE)
+# defaults:
+ifeq (,$(strip $(VCS_URL)))
+VCS_URL := $(_COMPILATIONID_PROJ_BASENAME)
+endif
+ifeq (,$(strip $(VCS_VERSION)))
+VCS_VERSION := noversion
 endif
 
-# use "svnversion -c" and strip, if mixed version, the leading (low) version number and colon
-_SVNID_INFO_VERSION := $(shell cd $(_COMPILATIONID_PROJ_ROOT_DIR) && svnversion -c | sed -e 's|^[0-9]*:||')
-ifeq (exported,$(strip $(_SVNID_INFO_VERSION)))
-_SVNID_INFO_VERSION := noversion
-endif
-ifeq (,$(strip $(_SVNID_INFO_VERSION)))
-_SVNID_INFO_VERSION := noversion
-endif
-
-_COMPILATIONID_STRING_LEAD = $(TARGET_NAME) $(_SVNID_INFO_URL) $(_SVNID_INFO_VERSION) $(_COMPILATIONID_PROJ_REL_HERE)/ at
+_COMPILATIONID_STRING_LEAD = $(TARGET_NAME) from $(VCS_URL) $(VCS_VERSION) $(_COMPILATIONID_PROJ_REL_HERE)/ at
 
 _COMPILATIONID_TARGET_C = $(subst -,_,$(TARGET_NAME))
 _COMPILATIONID_STRING_H_TOKEN = COMPILED_STRING_$(_COMPILATIONID_TARGET_C)_H_
@@ -77,7 +71,7 @@ $(COMPILATIONID_FILE_C): $(COMPILATIONID_FILE_H) $(_COMPILATIONID_MK_FILE)
 	@echo
 	@echo "Creating: $@"
 	@echo '#include "$(notdir $(COMPILATIONID_FILE_H))"' > $@
-	@echo '$(_COMPILATIONID_VERSIONSTRING_DECL) =  "$(_SVNID_INFO_VERSION)";' >> $@
+	@echo '$(_COMPILATIONID_VERSIONSTRING_DECL) =  "$(VCS_VERSION)";' >> $@
 	@echo '$(_COMPILATIONID_COMPILEDSTRING_DECL) = "$$Build: $(_COMPILATIONID_STRING_LEAD) " __DATE__ " " __TIME__ " $(CC) " __VERSION__ " $$";' >> $@
 
 .PHONY: clean cleanall

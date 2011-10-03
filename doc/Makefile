@@ -80,7 +80,13 @@ doc clean cleanall::
 	-@$(RM) -f $(DOXYGEN_EXAMPLES_DIR)/*.XXX
 
 endif
-	
+
+# versioning
+PROJECT_TOP_DIR = ..
+include $(dir $(_DOC_MAKEFILE))vcs.mk
+# sets VCS_URL and VCS_VERSION
+DOXYGEN_PROJECT_NUMBER = $(firstword $(strip $(VCS_VERSION)))
+
 Doxygen/incl-inputs: $(_DOC_MAKEFILE) $(_DOXMK_MKFILE_PATH)
 	@echo "Creating $@ for $(DOXYGEN_PROJECT_NAME)"
 	@test -d Doxygen || mkdir Doxygen
@@ -123,18 +129,6 @@ doc::
 
 clean cleanall::
 	$(RM) -rf Doxygen
-
-# versioning
-_SVN_VERSION = $(shell cd $(BASE_PROJECT_ROOT_DIR_SLASH) && svnversion)
-ifeq (exported,$(strip $(_SVN_VERSION)))
-# directories without SVN info are reported as "exported"
-_SVN_VERSION =
-endif
-ifeq (,$(strip $(_SVN_VERSION)))
-DOXYGEN_PROJECT_NUMBER = unversioned
-else
-DOXYGEN_PROJECT_NUMBER = SVN rel $(patsubst %M,%,$(patsubst %P,%,$(strip $(_SVN_VERSION))))
-endif
 
 .PHONY: rsync
 rsync:
