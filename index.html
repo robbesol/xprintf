@@ -16,51 +16,60 @@
       width: 700px;
     }
     h1 { font-size: 3.8em; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none; }
     h2 { font-size: 1.5em; }
     h3 { text-align: center; }
     a { color: #4183C4; text-decoration: none ; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
+    .italic { font-style: italic;}
     pre { background: black; color: white; padding: 15px;}
     hr { width: 80%; height: 4px; color: solid grey}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
   </style>
   </head>
   <body>
     <div id="container">
-      <h1><a href=".">xprintf</a> <span class="small">by <a href="/robbesol">robbesol</a></span></h1>
-      <div class="description"> a complete fprintf() formatting
-        implementation, suitable for embedded use </div>
-      <h2>License</h2>
-      <p>Open Source (<a href="http://www.opensource.org/licenses/BSD-2-Clause">Simplified BSD License</a>)</p>
-      <h2>Project</h2>
-      <p>Hosted on <a href="/">github</a> as <a href=".">robbesol/xprintf</a></p>
-      <p><a href="wiki">Wiki</a></p>
-      <p><a href="issues">Issues</a></p>
-      <p><a href="archives/master">Download</a></p>
-      <p>You can also clone the project with <a
-          href="http://git-scm.com">Git</a> by running: </p>
-      <pre>$ git clone git://github.com/robbesol/xprintf</pre>
-      <hr color="grey">
-      <table style=" margin-left: auto; margin-right: auto;" border="0" cellpadding="0" cellspacing="0">
+      <h1><a href=".">xprintf</a></h1>
+	   <h2>Summary</h2>      
+      <p class="italic">
+        xprintf is an ISO C99 fprintf() formatting implementation aimed at embedded SW. 
+        Your output stream is easily connected. 
+        Small code and stack footprint, no malloc(). 
+        Full ISO C99 implementation, floating point support can be disabled.
+      </p>
+      <p class="italic">
+        Xprintf is an independent implementation and is written from the ground up 
+        following the standard without borrowing any code.
+      </p>
+      <h2>Author</h2>
+      <table border="0" cellpadding="0" cellspacing="0">
         <tbody>
+          <tr>
+            <td>Markus van Dijk (<a href="/robbesol">robbesol</a>  on github)</td>
+			 </tr>
           <tr>
             <td style="text-align: center;">Contact: via <a
                 href="/inbox/new">github's inbox</a>
               to <span style="font-style: italic;">robbesol</span> or
               via mail to<br>
             </td>
-            <td style="font-style: italic;">&nbsp;xprintf&nbsp;</td>
-            <td style="font-style: italic;">a</td>
-            <td style="font-style: italic;">t</td>
-            <td style="font-style: italic;">&nbsp;robbesol</td>
-            <td style="font-style: italic;">⋅</td>
-            <td style="font-style: italic;">net</td>
+            <td class="italic">&nbsp;xprintf&nbsp;</td>
+            <td class="italic">a</td>
+            <td class="italic">t</td>
+            <td class="italic">&nbsp;robbesol</td>
+            <td class="italic">&sdot;</td>
+            <td class="italic">net</td>
           </tr>
         </tbody>
       </table>
+      <h2>License</h2>
+      <p>Open Source (<a href="http://www.opensource.org/licenses/BSD-2-Clause">Simplified BSD License</a>)</p>
+      <h2>Project</h2>
+      <p>Hosted on <a href="/">github</a> as <a href=".">robbesol/xprintf</a></p>
+      <p>&rarr; <a href="http://robbesol.github.com/xprintf/doc/">API and code documentation</a></p>
+      <p>&rarr; <a href="wiki">Wiki</a></p>
+      <p>&rarr; <a href="issues">Issues</a></p>
+      <p>&rarr; <a href="archives/master">Download</a></p>
+      <p>You can also clone the project with <a
+          href="http://git-scm.com">Git</a> by running: </p>
+      <pre>$ git clone git://github.com/robbesol/xprintf</pre>
     </div>
   </body>
 </html>
