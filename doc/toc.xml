@@ -1,0 +1,21 @@
+<toc label="xprintf" topic="index.html">
+  <topic label="Xprintf documentation" href="index.html"/>
+  <topic label="Data Structures" href="annotated.html">
+    <topic label="xprintf__conversionFlags" href="structxprintf____conversion_flags.html"/>
+    <topic label="xprintf__conversionPparams" href="structxprintf____conversion_pparams.html"/>
+    <topic label="xprintf_protectedChannel" href="structxprintf__protected_channel.html"/>
+    <topic label="xsnprintf_channel" href="structxsnprintf__channel.html"/>
+  </topic>
+  <topic label="Data Structure Index" href="classes.html"/>
+  <topic label="Data Fields" href="functions.html"/>
+  <topic label="File List" href="files.html">
+    <topic label="xdebug.h" href="xdebug_8h.html"/>
+    <topic label="xdebugchannel.h" href="xdebugchannel_8h.html"/>
+    <topic label="xsprintf.h" href="xsprintf_8h.html"/>
+    <topic label="impl/xprintf-core.h" href="xprintf-core_8h.html"/>
+    <topic label="impl/xprintf-debug.h" href="xprintf-debug_8h.html"/>
+    <topic label="impl/xprintf-intl.h" href="xprintf-intl_8h.html"/>
+    <topic label="impl/xvdebug.h" href="xvdebug_8h.html"/>
+  </topic>
+  <topic label="Globals" href="globals.html"/>
+</toc>
