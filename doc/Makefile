@@ -129,11 +129,3 @@ doc::
 
 clean cleanall::
 	$(RM) -rf Doxygen
-
-.PHONY: rsync
-rsync:
-	@echo
-	@echo "===== start publishing doc/html/ to website at berlios.de"
-	@test -d html || ( echo >&2 "***** no directory html/" ; exit 1; )
-	rsync -e 'ssh' -avz --delete html/ shell.berlios.de:/home/groups/xprintf/htdocs/doc
-	@echo "===== done publishing doc/html/ to website at berlios.de"

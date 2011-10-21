@@ -39,9 +39,9 @@
  * @mainpage Xprintf documentation
 
 Documentation for the
-<a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a>
+<a target="_blank" href="http://robbesol.github.com/xprintf/">xprintf project at <b>github</b></a>
 <div style="float: right;">
-@image html berlioslogo.png
+@image html github_logo.png
 </div>
 @version @sourceversion.
 
@@ -65,7 +65,7 @@ including debug output to a PC, writing to an embedded display and writing to fi
 In august 2011 <a href="http://www.technologies88.com/" target="T88">Technologies88</a>
 kindly gave permission to enter the code into the public domain and transferred all rights to Markus van Dijk.
 <br>
-The code now lives as <a target="_blank" href="http://xprintf.berlios.de/">xprintf project at BerliOS</a>.
+The code now lives as <a target="_blank" href="http://robbesol.github.com/xprintf/">xprintf project at <b>github</b></a>.
 
 @section xprintf_Compliance Compliance
 
