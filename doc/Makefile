@@ -51,7 +51,9 @@ endif
 
 DOXYGEN ?= doxygen
 
-DOXYGEN_OUTPUT_DIRECTORY ?= .
+DOXYGEN_OUTPUT_HTML_PATH = $(BASE_PROJECT_ROOT_DIR_SLASH)/../$(DOXYGEN_PROJECT_NAME)-web/doc
+DOXYGEN_OUTPUT_DIRECTORY = $(dir $(DOXYGEN_OUTPUT_HTML_PATH))
+DOXYGEN_OUTPUT_HTML_SUBDIR = $(notdir $(DOXYGEN_OUTPUT_HTML_PATH))
 
 DOXYGEN_CONFIG = Doxyfile
 
@@ -107,6 +109,7 @@ Doxygen/incl-general: $(_DOC_MAKEFILE) $(_DOXMK_MKFILE_PATH)
 	@echo >>$@ "PROJECT_BRIEF = \"$(DOXYGEN_PROJECT_BRIEF)\""
 	@echo >>$@ "GENERATE_TAGFILE = Doxygen/tags-$(DOXYGEN_PROJECT_NAME)"
 	@echo >>$@ "OUTPUT_DIRECTORY = $(DOXYGEN_OUTPUT_DIRECTORY)"
+	@echo >>$@ "HTML_OUTPUT = $(DOXYGEN_OUTPUT_HTML_SUBDIR)"	
 	@echo >>$@ "EXAMPLE_PATH = $(DOXYGEN_EXAMPLES_DIR)"
 	@echo >>$@ "ECLIPSE_DOC_ID = com.$(DOXYGEN_PROJECT_NAME)"
 ifneq (,$(DOXYGEN_IMAGE_PATH))
@@ -124,8 +127,9 @@ Doxygen/incl-version:
 .PHONY: doc
 
 doc:: Doxygen/incl-inputs Doxygen/incl-general Doxygen/incl-version $(DOXYGEN_CONFIG) $(DOXYGEN_EXAMPLE_XXX)
+	@echo "Cleaning old doc for $(DOXYGEN_PROJECT_NAME)"
+	-$(RM) -rf $(DOXYGEN_OUTPUT_HTML_PATH)/*
 	@echo "Running Doxygen for $(DOXYGEN_PROJECT_NAME)"
-	-@$(RM) -rf $(DOXYGEN_OUTPUT_DIRECTORY)/html/*
 	@$(DOXYGEN) $(DOXYGEN_CONFIG)
 
 doc::
