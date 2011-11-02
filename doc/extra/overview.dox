@@ -43,7 +43,7 @@ Documentation for the
 <div style="float: right;">
 @image html github_logo.png
 </div>
-@version @sourceversion.
+@version @sourceversion
 
 @section xprintf_Overview Overview
 

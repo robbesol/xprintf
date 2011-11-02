@@ -84,8 +84,9 @@ endif
 # versioning
 PROJECT_TOP_DIR = ..
 include $(dir $(_DOC_MAKEFILE))vcs.mk
-# sets VCS_URL and VCS_VERSION
-DOXYGEN_PROJECT_NUMBER = $(firstword $(strip $(VCS_VERSION)))
+# the include sets VCS_VERSION and VCS_VERSION_FULL
+DOXYGEN_PROJECT_NUMBER = $(strip $(VCS_VERSION))
+DOXYGEN_PROJECT_VERSION = $(strip $(VCS_VERSION_FULL))
 
 Doxygen/incl-inputs: $(_DOC_MAKEFILE) $(_DOXMK_MKFILE_PATH)
 	@echo "Creating $@ for $(DOXYGEN_PROJECT_NAME)"
@@ -114,8 +115,11 @@ endif
 
 .PHONY: Doxygen/incl-version
 Doxygen/incl-version:
+	@echo "Creating $@ for $(DOXYGEN_PROJECT_NAME)"
+	@test -d Doxygen || mkdir Doxygen
+	@echo >$@ "# generated `date`"
 	@echo >>$@ "PROJECT_NUMBER = \"$(DOXYGEN_PROJECT_NUMBER)\""
-	@echo >>$@ "ALIASES += sourceversion=\"$(DOXYGEN_PROJECT_NUMBER)\""
+	@echo >>$@ "ALIASES += sourceversion=\"$(DOXYGEN_PROJECT_VERSION)\""
 
 .PHONY: doc
 
