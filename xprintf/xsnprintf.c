@@ -137,6 +137,7 @@ int xvsnprintf(char * restrict str, size_t size, const char * restrict format,
 	if (size == 0) {
 		// use null channel to indicate "do not write"
 		xchpr.channel = 0;
+		return xvprintf_protected(&xchpr, format, ap);
 	} else if (str == 0) {
 		return ERRNO_NULL_ARG;
 	} else {
@@ -146,9 +147,8 @@ int xvsnprintf(char * restrict str, size_t size, const char * restrict format,
 				.maxNullPos = str + size - 1 //
 				};
 		xchpr.channel = &data;
+		return xvprintf_protected(&xchpr, format, ap);
 	}
-
-	return xvprintf_protected(&xchpr, format, ap);
 }
 
 int xsnprintf(char * restrict str, size_t size, const char * restrict format,
